@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Login - Controle de Sistemas - SKELT</title>
+<style>
+:root {
+  --primary: #003c8f;
+  --accent: #0277bd;
+  --bg: #f5f7fa;
+  --card: #fff;
+  --text: #333;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;background-color:var(--bg);color:var(--text);overflow-x:hidden;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-height:100vh}
+
+/* Banner */
+.banner-carousel{position:relative;width:100%;height:250px;overflow:hidden;border-bottom:3px solid var(--primary);border-radius:0 0 15px 15px;box-shadow:0 4px 15px rgba(0,0,0,0.2)}
+.banner-carousel img{width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;opacity:0;transition:opacity 1s ease-in-out, transform 1s ease-in-out}
+.banner-carousel img.active{opacity:1;transform:scale(1.05)}
+
+/* Login Box */
+.login-box {
+  background: var(--card);
+  padding: 40px 30px;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  margin-top: 40px;
+  width: 320px;
+  text-align: center;
+  animation: fadeInUp 1.5s ease;
+  position: relative;
+  z-index: 1;
+}
+.login-box h2 { color: var(--primary); margin-bottom: 25px; font-size: 1.8em; }
+
+.input-group { position: relative; }
+
+.login-box input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1em;
+}
+
+/* Botão Mostrar Senha */
+.toggle-pass {
+  position: absolute;
+  right: 12px;
+  top: 22px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 14px;
+  color: var(--accent);
+}
+
+.login-box button {
+  width: 100%;
+  padding: 12px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.1em;
+  font-weight: bold;
+  box-shadow: 0 0 15px rgba(2,119,189,0.6);
+  transition: all 0.3s ease;
+  animation: pulseGlow 2s infinite;
+}
+.login-box button:hover{
+  background: var(--primary);
+  box-shadow: 0 0 25px rgba(3,155,229,0.9);
+  transform: scale(1.05);
+}
+.error { color: red; margin-top: 10px; }
+
+/* Animações */
+@keyframes pulseGlow{0%{box-shadow:0 0 10px rgba(3,155,229,0.3)}50%{box-shadow:0 0 25px rgba(3,155,229,0.8)}100%{box-shadow:0 0 10px rgba(3,155,229,0.3)}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+
+/* Responsivo */
+@media(max-width:768px){
+  .banner-carousel{height:180px}
+  .login-box{width:min(90%,350px)}
+}
+
+/* Fundo animado */
+#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
+
+/* Rodapé */
+footer {
+  margin-top: 45px;
+  margin-bottom: 20px;
+  color: #777;
+  font-size: 14px;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<div class="banner-carousel">
+  <img src="https://res.cloudinary.com/beleza-na-web/image/upload/f_auto,fl_progressive,q_auto:best/v1/vitrine/2022_11_29_10_14_40_8/9cf23f62-66b8-47d8-9871-43a216c0b5a2-skelt-banner-rosto.png" class="active">
+  <img src="https://media.fashionnetwork.com/cdn-cgi/image/fit=contain,width=1000,height=1000,format=auto/m/322a/1301/1cb1/e5b4/4963/e53f/8636/6faa/8a9f/15d8/15d8.png">
+  <img src="https://raichu-uploads.s3.amazonaws.com/companypageconfiguration_cc5a4439-560f-4646-8ed9-f8b901c49ba9.jpg">
+  <img src="https://www.vincereincorporadora.com.br/wp-content/uploads/2022/07/no-meio-do-complexo.jpg">
+</div>
+
+<div class="login-box">
+  <h2>Login</h2>
+
+  <input type="text" id="username" placeholder="Usuário">
+
+  <div class="input-group">
+    <input type="password" id="password" placeholder="Senha">
+    <span class="toggle-pass" onclick="togglePass()">👁</span>
+  </div>
+
+  <button onclick="login()">Entrar</button>
+  <p class="error" id="error-msg"></p>
+</div>
+
+<footer>Desenvolvido por <strong>João Lucas</strong> - Aprendiz - Supply Chain</footer>
+
+<script>
+function togglePass() {
+  const p = document.getElementById("password");
+  p.type = p.type === "password" ? "text" : "password";
+}
+
+/* Login usando Google Sheets */
+async function login() {
+  const user = document.getElementById('username').value.trim();
+  const pass = document.getElementById('password').value.trim();
+  const errorMsg = document.getElementById('error-msg');
+
+  const url = "https://script.google.com/macros/s/AKfycbx5zLHvFZFm_7COwdHLEpkE_DBKsGkhfAhGbiTxYUaVF58FGjJb1Ezb6QL4uvKLPjYItA/exec"
+              + `?user=${encodeURIComponent(user)}&pass=${encodeURIComponent(pass)}`;
+
+  try {
+    const response = await fetch(url);
+    const result = await response.text();
+
+    if(result !== "INVALID") {
+      window.location.href = result;
+    } else {
+      errorMsg.textContent = "Usuário ou senha incorretos!";
+    }
+
+  } catch {
+    errorMsg.textContent = "Erro de conexão. Tente novamente.";
+  }
+}
+</script>
+
+</body>
+</html>
