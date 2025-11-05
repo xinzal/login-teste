@@ -34,25 +34,41 @@ body{font-family:Arial,Helvetica,sans-serif;background-color:var(--bg);color:var
   position: relative;
   z-index: 1;
 }
-.login-box h2 {color: var(--primary);margin-bottom: 25px;font-size: 1.8em;}
-.login-box input {width: 100%;padding: 12px;margin: 10px 0;border-radius: 6px;border: 1px solid #ccc;font-size: 1em;}
-.login-box button {
-  width: 100%;padding: 12px;background: var(--accent);color: #fff;border: none;border-radius: 6px;cursor: pointer;font-size: 1.1em;font-weight: bold;
-  box-shadow: 0 0 15px rgba(2,119,189,0.6);transition: all 0.3s ease;animation: pulseGlow 2s infinite;
+.login-box h2 {
+  color: var(--primary);
+  margin-bottom: 25px;
+  font-size: 1.8em;
 }
-.login-box button:hover{background: var(--primary);box-shadow: 0 0 25px rgba(3,155,229,0.9);transform: scale(1.05);}
-.error {color: red;margin-top: 10px;}
-
-/* Rodapé */
-footer{
-  margin-top:auto;
-  padding:15px;
-  background:#003c8f;
-  width:100%;
-  color:white;
-  text-align:center;
-  font-size:14px;
-  border-top:3px solid #01427a;
+.login-box input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1em;
+}
+.login-box button {
+  width: 100%;
+  padding: 12px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.1em;
+  font-weight: bold;
+  box-shadow: 0 0 15px rgba(2,119,189,0.6);
+  transition: all 0.3s ease;
+  animation: pulseGlow 2s infinite;
+}
+.login-box button:hover{
+  background: var(--primary);
+  box-shadow: 0 0 25px rgba(3,155,229,0.9);
+  transform: scale(1.05);
+}
+.error {
+  color: red;
+  margin-top: 10px;
 }
 
 /* Animações */
@@ -90,43 +106,81 @@ footer{
   <p class="error" id="error-msg"></p>
 </div>
 
-<footer>Desenvolvido por João Lucas - Aprendiz - Supply Chain</footer>
-
 <script>
-/* Fundo animado */
-const canvas=document.getElementById('bgCanvas');const ctx=canvas.getContext('2d');
-canvas.width=window.innerWidth;canvas.height=window.innerHeight;
-let waves=[];const colors=['rgba(3,155,229,0.3)','rgba(41,182,246,0.25)','rgba(33,150,243,0.2)'];
-for(let i=0;i<3;i++){waves.push({y:canvas.height/2+i*30,amplitude:50+i*10,wavelength:200+i*50,speed:0.015+i*0.005,phase:0,color:colors[i]});}
-function drawWave(w){ctx.beginPath();for(let x=0;x<canvas.width;x+=1){ctx.lineTo(x,w.y+Math.sin((x/w.wavelength)+w.phase)*w.amplitude);}ctx.strokeStyle=w.color;ctx.lineWidth=2;ctx.stroke();}
-function animate(){ctx.clearRect(0,0,canvas.width,canvas.height);waves.forEach(w=>{w.phase+=w.speed;drawWave(w);});requestAnimationFrame(animate);}animate();
-window.addEventListener('resize',()=>{canvas.width=window.innerWidth;canvas.height=window.innerHeight});
+/* Fundo animado - ondas fluidas */
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let waves = [];
+const colors = ['rgba(3,155,229,0.3)','rgba(41,182,246,0.25)','rgba(33,150,243,0.2)'];
+
+// velocidades levemente mais lentas
+for(let i=0;i<3;i++){
+  waves.push({
+    y: canvas.height/2 + i*30,
+    amplitude: 50 + i*10,
+    wavelength: 200 + i*50,
+    speed: 0.015 + i*0.005, // ligeiramente mais lento
+    phase: 0,
+    color: colors[i]
+  });
+}
+
+function drawWave(wave){
+  ctx.beginPath();
+  for(let x=0;x<canvas.width;x+=1){
+    let y = wave.y + Math.sin((x/wave.wavelength) + wave.phase)*wave.amplitude;
+    ctx.lineTo(x,y);
+  }
+  ctx.strokeStyle = wave.color;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
+
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  waves.forEach(wave=>{
+    wave.phase += wave.speed;
+    drawWave(wave);
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+
+window.addEventListener('resize',()=>{canvas.width=window.innerWidth; canvas.height=window.innerHeight});
 
 /* Carrossel */
-const imgs=document.querySelectorAll('.banner-carousel img');let current=0;
-setInterval(()=>{imgs[current].classList.remove('active');current=(current+1)%imgs.length;imgs[current].classList.add('active');},6000);
+const imgs=document.querySelectorAll('.banner-carousel img');
+let current=0;
+setInterval(()=>{
+  imgs[current].classList.remove('active');
+  current=(current+1)%imgs.length;
+  imgs[current].classList.add('active');
+},6000);
 
-/* Login via Web App */
+/* Login funcional */
 function login() {
-  const user = document.getElementById('username').value.trim();
-  const pass = document.getElementById('password').value.trim();
+  const user = document.getElementById('username').value;
+  const pass = document.getElementById('password').value;
   const errorMsg = document.getElementById('error-msg');
 
-  fetch(`https://script.google.com/macros/s/AKfycby8PKl0riF-841Dw8mtwudIi5Xm03Lm62mhLmJnjaEEUz39C_RxnJlNi1Kc64p3xxOiPQ/exec?user=${encodeURIComponent(user)}&pass=${encodeURIComponent(pass)}`)
-    .then(response => response.text())
-    .then(url => {
-      url = url.trim();
-      if (url && url !== "INVALID") {
-        window.location.href = url;
-      } else {
-        errorMsg.textContent = "Usuário ou senha incorretos!";
-      }
-    })
-    .catch(err => {
-      console.log(err);
-      errorMsg.textContent = "Erro de comunicação com o servidor!";
-    });
+  const logins = {
+    "CorporativoSolicita": ["CorporativoSolicita@123", "https://xinzal.github.io/SITE-FABRICA4"],
+    "LetsCargo": ["LetsCargo@123", "https://xinzal.github.io/BASE-DE-DADOS-Lets-Cargo"],
+    "CorporativoGestao": ["CorporativoGestao@123", "https://xinzal.github.io/CONTROLE-SOLICITA-ES-FAB"],
+    "UNA": ["UNA@123", "https://xinzal.github.io/GEST-O-NOTAS-UNA/"],
+    "CorporativoCoberturas": ["CorporativoCoberturas@123", "https://xinzal.github.io/cadastro-coberturas-supply/"]
+  };
+
+  if(logins[user] && pass === logins[user][0]){
+    window.location.href = logins[user][1];
+  } else {
+    errorMsg.textContent = "Usuário ou senha incorretos!";
+  }
 }
 </script>
+
 </body>
 </html>
