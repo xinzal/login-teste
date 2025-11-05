@@ -93,7 +93,7 @@ footer{
 <footer>Desenvolvido por João Lucas - Aprendiz - Supply Chain</footer>
 
 <script>
-/* fundo animado */
+/* Fundo animado */
 const canvas=document.getElementById('bgCanvas');const ctx=canvas.getContext('2d');
 canvas.width=window.innerWidth;canvas.height=window.innerHeight;
 let waves=[];const colors=['rgba(3,155,229,0.3)','rgba(41,182,246,0.25)','rgba(33,150,243,0.2)'];
@@ -106,26 +106,26 @@ window.addEventListener('resize',()=>{canvas.width=window.innerWidth;canvas.heig
 const imgs=document.querySelectorAll('.banner-carousel img');let current=0;
 setInterval(()=>{imgs[current].classList.remove('active');current=(current+1)%imgs.length;imgs[current].classList.add('active');},6000);
 
-/* ===== LOGIN VIA WEB APP ===== */
-let accessData = [];
-
-fetch("https://script.google.com/macros/s/AKfycbx5zLHvFZFm_7COwdHLEpkE_DBKsGkhfAhGbiTxYUaVF58FGjJb1Ezb6QL4uvKLPjYItA/exec")
-  .then(r => r.json())
-  .then(data => { accessData = data; })
-  .catch(() => { document.getElementById("error-msg").textContent = "Erro ao carregar acessos."; });
-
+/* Login via Web App */
 function login() {
-  const user=document.getElementById('username').value.trim();
-  const pass=document.getElementById('password').value.trim();
-  const error=document.getElementById('error-msg');
+  const user = document.getElementById('username').value.trim();
+  const pass = document.getElementById('password').value.trim();
+  const errorMsg = document.getElementById('error-msg');
 
-  const found = accessData.find(acc => acc.user === user && acc.pass === pass);
-
-  if(found){
-    window.location.href = found.url;
-  } else {
-    error.textContent = "Usuário ou senha incorretos!";
-  }
+  fetch(`https://script.google.com/macros/s/AKfycby8PKl0riF-841Dw8mtwudIi5Xm03Lm62mhLmJnjaEEUz39C_RxnJlNi1Kc64p3xxOiPQ/exec?user=${encodeURIComponent(user)}&pass=${encodeURIComponent(pass)}`)
+    .then(response => response.text())
+    .then(url => {
+      url = url.trim();
+      if (url && url !== "INVALID") {
+        window.location.href = url;
+      } else {
+        errorMsg.textContent = "Usuário ou senha incorretos!";
+      }
+    })
+    .catch(err => {
+      console.log(err);
+      errorMsg.textContent = "Erro de comunicação com o servidor!";
+    });
 }
 </script>
 </body>
